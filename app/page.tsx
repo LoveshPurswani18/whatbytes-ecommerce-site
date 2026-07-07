@@ -1,6 +1,9 @@
+
 import { getProducts, getCategories } from "@/lib/api";
 import { ClientCatalog } from "@/components/product/ClientCatalog";
 import { Suspense } from "react";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [products, categories] = await Promise.all([

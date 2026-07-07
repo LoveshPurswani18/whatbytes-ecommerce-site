@@ -10,25 +10,29 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <div className="group flex flex-col rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 transition-all hover:shadow-md h-full">
-      <Link href={`/product/${product.id}`} className="flex-1">
+    <div className="group flex flex-col bg-white p-5 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-shadow h-full border border-gray-50">
+      <Link href={`/product/${product.id}`} className="flex-1 flex flex-col">
         <ProductImage
           src={product.image}
           alt={product.title}
-          className="aspect-square w-full rounded-lg bg-gray-50 mb-4 group-hover:opacity-90 transition-opacity"
+          className="aspect-[4/3] w-full bg-white mb-4 group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="space-y-2">
-          <h3 className="font-semibold text-gray-900 line-clamp-2 leading-tight">
+        <div className="flex flex-col flex-1">
+          <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 leading-snug">
             {product.title}
           </h3>
-          <p className="text-xl font-bold text-gray-900">${product.price.toFixed(2)}</p>
+          <p className="text-xl font-bold text-gray-900 mt-1 mb-2">
+            ${product.price.toString().includes('.') ? product.price.toFixed(2) : product.price}
+          </p>
           {product.rating && (
-            <StarRating rating={product.rating.rate} />
+            <div className="mt-auto">
+              <StarRating rating={product.rating.rate} />
+            </div>
           )}
         </div>
       </Link>
-      <div className="mt-4">
-        <Button className="w-full font-semibold">
+      <div className="mt-5">
+        <Button className="w-full rounded-xl py-6 font-semibold text-base shadow-sm">
           Add to Cart
         </Button>
       </div>

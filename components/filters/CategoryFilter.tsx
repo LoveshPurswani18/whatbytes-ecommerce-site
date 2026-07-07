@@ -1,57 +1,46 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
 
 interface CategoryFilterProps {
   categories: string[];
 }
 
-export function CategoryFilter({ categories }: CategoryFilterProps) {
+function CategoryFilterContent({ categories }: CategoryFilterProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  
   const currentCategory = searchParams.get("category") || "all";
-  const [isPending, startTransition] = useTransition();
-
-  const handleSelect = useCallback(
-    (category: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (category === "all") {
-        params.delete("category");
-      } else {
-        params.set("category", category);
-      }
-      startTransition(() => {
-        router.push(`/?${params.toString()}`);
-      });
-    },
-    [router, searchParams]
-  );
-
   const options = ["all", ...categories];
+
+  const handleSelect = (category: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    // Update URL as the single source of truth using replace
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold text-white mb-4">Category</h3>
-      <div className={cn("space-y-2", isPending && "opacity-70")}>
+      <div className="space-y-2">
         {options.map((category) => {
           const isSelected = currentCategory === category;
           return (
-            <label
+            <button
               key={category}
-              className="flex items-center space-x-3 cursor-pointer group"
+              onClick={() => handleSelect(category)}
+              className="flex items-center space-x-3 group w-full text-left"
             >
-              <div className="relative flex items-center justify-center w-5 h-5">
-                <input
-                  type="radio"
-                  name="category"
-                  value={category}
-                  checked={isSelected}
-                  onChange={() => handleSelect(category)}
-                  className="peer sr-only"
-                />
-                <div className="w-5 h-5 border-2 border-white/50 rounded-full peer-checked:border-white transition-colors"></div>
+              <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <div className={cn("w-5 h-5 border-2 rounded-full transition-colors", isSelected ? "border-white" : "border-white/50")}></div>
                 {isSelected && (
                   <div className="absolute w-2.5 h-2.5 bg-white rounded-full"></div>
                 )}
@@ -64,10 +53,18 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
               >
                 {category}
               </span>
-            </label>
+            </button>
           );
         })}
       </div>
     </div>
+  );
+}
+
+export function CategoryFilter(props: CategoryFilterProps) {
+  return (
+    <Suspense fallback={<div className="h-48 animate-pulse bg-white/5 rounded-xl"></div>}>
+      <CategoryFilterContent {...props} />
+    </Suspense>
   );
 }

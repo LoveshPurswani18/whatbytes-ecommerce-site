@@ -1,92 +1,76 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect, useTransition } from "react";
-import { cn } from "@/lib/utils";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
 
 interface PriceFilterProps {
   minPrice: number;
   maxPrice: number;
 }
 
-export function PriceFilter({ minPrice, maxPrice }: PriceFilterProps) {
+function PriceFilterContent({ minPrice, maxPrice }: PriceFilterProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  
   const priceParam = searchParams.get("price");
-  const [isPending, startTransition] = useTransition();
+  const urlMaxPrice = priceParam ? parseFloat(priceParam.split("-")[1]) : maxPrice;
+  
+  // Local state purely for visual UX while dragging
+  const [localMax, setLocalMax] = useState(urlMaxPrice);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Parse URL param or fallback to actual min/max
-  const initialMax = priceParam ? parseFloat(priceParam.split("-")[1]) : maxPrice;
-  const [currentMax, setCurrentMax] = useState(initialMax);
-
-  // Sync state if props/url change
+  // Sync local state when URL changes (e.g., reset filters or back button)
   useEffect(() => {
-    if (priceParam) {
-      setCurrentMax(parseFloat(priceParam.split("-")[1]));
-    } else {
-      setCurrentMax(maxPrice);
-    }
-  }, [priceParam, maxPrice]);
+    setLocalMax(urlMaxPrice);
+  }, [urlMaxPrice]);
 
-  const handleUpdate = useCallback(
-    (newMax: number) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setLocalMax(val); // Instant UI update
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    
+    debounceRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
-      if (newMax >= maxPrice) {
+      if (val >= maxPrice) {
         params.delete("price");
       } else {
-        params.set("price", `${Math.floor(minPrice)}-${Math.ceil(newMax)}`);
+        params.set("price", `${Math.floor(minPrice)}-${Math.ceil(val)}`);
       }
-      startTransition(() => {
-        router.push(`/?${params.toString()}`);
-      });
-    },
-    [router, searchParams, minPrice, maxPrice]
-  );
-
-  // Debounce the URL update while dragging
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (currentMax !== (priceParam ? parseFloat(priceParam.split("-")[1]) : maxPrice)) {
-        handleUpdate(currentMax);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [currentMax, handleUpdate, priceParam, maxPrice]);
-
-  const percentage = ((currentMax - minPrice) / (maxPrice - minPrice)) * 100 || 0;
+      // Apply filter to URL
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, 300);
+  };
 
   return (
-    <div className={cn("space-y-6 mt-8", isPending && "opacity-70")}>
+    <div className="space-y-6 mt-8">
       <h3 className="text-lg font-semibold text-white">Price</h3>
       
-      <div className="relative w-full h-1 bg-white/30 rounded-full">
-        {/* Active Track */}
-        <div 
-          className="absolute h-full bg-white rounded-full"
-          style={{ width: `${percentage}%` }}
-        ></div>
-        
-        {/* Range Input overlaid */}
+      <div className="relative w-full flex items-center py-2">
         <input
           type="range"
           min={Math.floor(minPrice)}
           max={Math.ceil(maxPrice)}
-          value={currentMax}
-          onChange={(e) => setCurrentMax(parseFloat(e.target.value))}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          value={localMax}
+          onChange={handleChange}
+          className="w-full cursor-pointer accent-white"
+          style={{ accentColor: "white" }}
         />
-        
-        {/* Custom Thumb */}
-        <div 
-          className="absolute top-1/2 -mt-2.5 -ml-2.5 w-5 h-5 bg-white rounded-full shadow pointer-events-none"
-          style={{ left: `${percentage}%` }}
-        ></div>
       </div>
 
       <div className="flex justify-between text-white font-medium text-sm">
         <span>${Math.floor(minPrice)}</span>
-        <span>${Math.ceil(currentMax)}</span>
+        <span>${Math.ceil(localMax)}</span>
       </div>
     </div>
+  );
+}
+
+export function PriceFilter(props: PriceFilterProps) {
+  return (
+    <Suspense fallback={<div className="h-16 animate-pulse bg-white/5 rounded-xl mt-8"></div>}>
+      <PriceFilterContent {...props} />
+    </Suspense>
   );
 }

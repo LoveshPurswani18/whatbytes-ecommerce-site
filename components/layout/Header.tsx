@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { SearchBar } from "../filters/SearchBar";
 import { Button } from "../ui/Button";
 import { ShoppingCart } from "lucide-react";
@@ -14,7 +15,9 @@ export function Header() {
         </div>
         
         <div className="hidden md:flex flex-1 justify-center px-8">
-          <SearchBar />
+          <Suspense fallback={<div className="w-full max-w-xl h-10 bg-white/10 rounded-md"></div>}>
+            <SearchBar />
+          </Suspense>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -25,7 +28,9 @@ export function Header() {
         </div>
       </div>
       <div className="md:hidden px-6 pb-4">
-        <SearchBar />
+        <Suspense fallback={<div className="w-full max-w-xl h-10 bg-white/10 rounded-md"></div>}>
+          <SearchBar />
+        </Suspense>
       </div>
     </header>
   );

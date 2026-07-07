@@ -1,5 +1,3 @@
-"use client";
-
 import { CategoryFilter } from "./CategoryFilter";
 import { PriceFilter } from "./PriceFilter";
 

@@ -14,7 +14,8 @@ function PriceFilterContent({ minPrice, maxPrice }: PriceFilterProps) {
   const searchParams = useSearchParams();
   
   const priceParam = searchParams.get("price");
-  const urlMaxPrice = priceParam ? parseFloat(priceParam.split("-")[1]) : maxPrice;
+  let parsedMax = priceParam ? parseFloat(priceParam.split("-")[1]) : maxPrice;
+  const urlMaxPrice = isNaN(parsedMax) ? maxPrice : parsedMax;
   
   // Local state purely for visual UX while dragging
   const [localMax, setLocalMax] = useState(urlMaxPrice);

@@ -19,7 +19,7 @@ export default function Error({
     <div className="flex flex-col items-center justify-center py-32 px-6 text-center flex-1">
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong!</h2>
       <p className="text-gray-500 mb-8 max-w-md">
-        We encountered an error while fetching the products. Please try again.
+        {error.message}
       </p>
       <Button onClick={() => reset()} className="px-8">
         Try again

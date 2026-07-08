@@ -2,9 +2,10 @@
 
 import { CartItem as CartItemType } from "@/lib/types";
 import { useCartStore } from "@/store/cartStore";
+import { useToastStore } from "@/store/toastStore";
 import { ProductImage } from "../product/ProductImage";
 import { QuantitySelector } from "../product/QuantitySelector";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/Button";
 
@@ -14,13 +15,21 @@ interface CartItemProps {
 
 export function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeFromCart } = useCartStore();
+  const addToast = useToastStore((state) => state.addToast);
 
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.id, newQuantity);
+    addToast(
+      <span>Updated quantity for <span className="font-bold italic text-gray-900">{item.title}</span></span>
+    );
   };
 
   const handleRemove = () => {
     removeFromCart(item.id);
+    addToast(
+      <span>Removed <span className="font-bold italic text-gray-900">{item.title}</span> from cart</span>, 
+      'info'
+    );
   };
 
   return (
@@ -48,7 +57,10 @@ export function CartItem({ item }: CartItemProps) {
         </p>
 
         <div className="flex justify-between items-center mt-auto pt-4">
-          <QuantitySelector value={item.quantity} onChange={handleQuantityChange} />
+          <QuantitySelector 
+            value={item.quantity} 
+            onChange={handleQuantityChange}
+          />
           <Button 
             variant="ghost" 
             size="sm" 

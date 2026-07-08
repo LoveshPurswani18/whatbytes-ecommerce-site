@@ -8,10 +8,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ShoppingBag } from "lucide-react";
 
+import { useToastStore } from "@/store/toastStore";
+
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const addToast = useToastStore((state) => state.addToast);
   const [mounted, setMounted] = useState(false);
+
+  const handleClearCart = () => {
+    clearCart();
+    addToast("Cart cleared", "info");
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -59,7 +67,7 @@ export default function CartPage() {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
           Shopping Cart ({items.reduce((acc, item) => acc + item.quantity, 0)})
         </h1>
-        <Button variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={clearCart}>
+        <Button variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={handleClearCart}>
           Clear Cart
         </Button>
       </div>

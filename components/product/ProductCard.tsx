@@ -22,7 +22,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.title}
           </h3>
           <p className="text-xl font-bold text-gray-900 mt-1 mb-2">
-            ${product.price.toString().includes('.') ? product.price.toFixed(2) : product.price}
+            ${product.price.toFixed(2)}
           </p>
           {product.rating && (
             <div className="mt-auto">

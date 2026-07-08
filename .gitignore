@@ -41,3 +41,5 @@ yarn-error.log*
 next-env.d.ts
 .agents/
 PRD.md
+Phase2_QA_Audit.md
+QA_Audit_Report.md

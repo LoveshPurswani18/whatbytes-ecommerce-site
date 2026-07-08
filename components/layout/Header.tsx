@@ -4,6 +4,7 @@ import { SearchBar } from "../filters/SearchBar";
 import { Button } from "../ui/Button";
 import { ShoppingCart } from "lucide-react";
 import { CartBadge } from "./CartBadge";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 export function Header() {
   return (
@@ -21,8 +22,9 @@ export function Header() {
           </Suspense>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <CartBadge />
+          <ProfileDropdown />
         </div>
       </div>
       <div className="md:hidden px-6 pb-4">

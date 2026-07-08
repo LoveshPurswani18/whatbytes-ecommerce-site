@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { SearchBar } from "../filters/SearchBar";
 import { Button } from "../ui/Button";
 import { ShoppingCart } from "lucide-react";
+import { CartBadge } from "./CartBadge";
 
 export function Header() {
   return (
@@ -21,10 +22,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="icon" className="h-11 px-6 rounded-lg font-semibold gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            Cart
-          </Button>
+          <CartBadge />
         </div>
       </div>
       <div className="md:hidden px-6 pb-4">

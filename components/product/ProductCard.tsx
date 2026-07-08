@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Product } from "@/lib/types";
 import { ProductImage } from "./ProductImage";
 import { StarRating } from "../ui/StarRating";
-import { Button } from "../ui/Button";
+import { AddToCartButton } from "./AddToCartButton";
 
 interface ProductCardProps {
   product: Product;
@@ -32,9 +32,10 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       <div className="mt-5">
-        <Button className="w-full rounded-xl py-6 font-semibold text-base shadow-sm">
-          Add to Cart
-        </Button>
+        <AddToCartButton 
+          product={product} 
+          className="w-full rounded-xl py-6 font-semibold text-base shadow-sm" 
+        />
       </div>
     </div>
   );
